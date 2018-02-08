@@ -1,0 +1,69 @@
+---
+title: "GLM_DBDATA"
+output:
+  html_document:
+    df_print: paged
+---
+
+##시뮬레이션 데이터를 활용한 GLM 적용 
+
+
+```{r data loading}
+data2 <- read.csv("D:/data2.csv", header=TRUE)
+colSums(is.na(data2)) #missing value check
+data3 <- data2
+data4 <- na.omit(data3) #omit missing value
+colSums(is.na(data4)) # check missing value after omit
+#attach(data4)
+data4$bj7 <- as.integer(data4$bj7) #factor -> integer
+```
+
+```{r aboutdata5}
+data5 <- filter(data4, opre >0, liab>0)
+data5$pl <- data5$liab/data5$opre
+colSums(is.na(data5))
+```
+
+```{r about data6}
+data6 <- filter(data5, opre>liab) #발생손해액보다 큰 보험료만 저장(편의)
+data6$pl <- data6$liab/data6$opre #발생손해액/원보험료
+str(data6)
+```
+
+#GLM
+
+### 모든 변수 적용 
+
+```{r glm all}
+glm.all.data6 <- glm(pl~DBCD+mcn+isd+bj7+ageg+isex+dbgr+bjg,family=Gamma(link=log),data=data6)
+summary(glm.all.data6)
+```
+
+### Stepwise 적용
+
+```{r glm step}
+data6.glm <- glm(pl~DBCD+mcn+isd+bj7+ageg+isex+dbgr+bjg,family=Gamma(link=log),data=data6)
+set.data6.glm <- step(data6.glm)
+```
+
+### step 결과 요약 
+
+```{r glm step summary}
+summary(set.data6.glm)
+```
+
+### 성별을 factor로 적용한 glm
+
+```{r glam facotr(sex)}
+glm.all.data6_fsex <- glm(pl~DBCD+mcn+isd+bj7+ageg+factor(isex)+dbgr+bjg,family=Gamma(link=log),data=data6)
+summary(glm.all.data6_fsex)
+```
+
+### 성별과 채널의 interaction effect glm
+
+```{r glm interaction sex*mcn}
+glm.all.data6_fsex_ef <- glm(pl~DBCD+mcn*factor(isex)+isd+bj7+ageg+factor(isex)+dbgr+bjg,family=Gamma(link=log),data=data6)
+summary(glm.all.data6_fsex_ef)
+```
+
+

@@ -1,0 +1,61 @@
+---
+title: "glm-DB_data"
+output: html_document
+---
+
+### 데이터 불러오기
+
+```{r data loading}
+data2 <- read.csv("D:/data2.csv", header=TRUE)
+colSums(is.na(data2)) #missing value check
+data3 <- data2
+data4 <- na.omit(data3) #omit missing value
+colSums(is.na(data4)) # check missing value after omit
+#attach(data4)
+data4$bj7 <- as.integer(data4$bj7) #factor -> integer
+```
+
+### 데이터 정리
+
+```{r datapre}
+
+data5 <- filter(data4, opre >0, liab>0) # remove negative value
+#str(data5) # check data structure
+data5$pl <- data5$liab/data5$opre
+colSums(is.na(data5))
+data6 <- filter(data5, opre>liab) #발생손해액보다 큰 보험료만 저장(편의)
+data6$pl <- data6$liab/data6$opre #발생손해액/원보험료
+str(data6)
+
+```
+
+###glm
+
+link function - logint, distribution - gamma
+
+```{r glm.db_data1}
+glm.all.data6 <- glm(pl~DBCD+mcn+isd+bj7+ageg+isex+dbgr+bjg,family=Gamma(link=log),data=data6)
+summary(glm.all.data6)
+```
+
+``` {r glm.db_data2}
+data6.glm <- glm(pl~DBCD+mcn+isd+bj7+ageg+isex+dbgr+bjg,family=Gamma(link=log),data=data6)
+set.data6.glm <- step(data6.glm)
+
+```
+
+```{r glm.db_data3}
+summary(set.data6.glm)
+```
+
+
+```{r glm.db_data4}
+glm.all.data6_fsex <- glm(pl~DBCD+mcn+isd+bj7+ageg+factor(isex)+dbgr+bjg,family=Gamma(link=log),data=data6)
+summary(glm.all.data6_fsex)
+```
+
+```{r glm.db_data5}
+glm.all.data6_fsex_ef <- glm(pl~DBCD+mcn*factor(isex)+isd+bj7+ageg+factor(isex)+dbgr+bjg,family=Gamma(link=log),data=data6)
+summary(glm.all.data6_fsex_ef)
+```
+
