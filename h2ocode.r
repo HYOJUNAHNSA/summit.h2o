@@ -1,0 +1,21 @@
+h2o.init()
+library(h2o)
+h2o.init()
+train_file("D:/train.csv")
+train_file <- ("D:/train.csv")
+test_file <- ("D:/test.csv")
+train <- h2o.importFile(train_file)
+test <- h2o.importfile(test_file)
+test <- h2o.importFile(test_file)
+summary(train)
+summary(test)
+y <- "C785"
+x <- setdiff(names(train),y)
+train[,y] <- as.factor(train[,y])
+test[,y] <- as.factor(test[,y])
+model <- h2o.deeplearning(x = x, y = y,training_frame = train,validation_frame = test,distribution = "multinomial",activation = "RectifierWithDropout",hidden = c(32,32,32),input_dropout_ratio = 0.2,sparse = TRUE,l1 = 1e-5,epochs = 10)
+model@parameters
+model <- h2o.deeplearning(x = x, y = y,training_frame = train,validation_frame = test,distribution = "multinomial",activation = "RectifierWithDropout",hidden = c(32,32,32),input_dropout_ratio = 0.2,sparse = TRUE,l1 = 1e-5,epochs = 10, nfolds=5)
+model
+h2o.performance(model)
+savehistory("~/summit.h2o/h2ocode.r")
