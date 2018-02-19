@@ -14,7 +14,7 @@ data4$bj7 <- as.integer(data4$bj7) #factor -> integer
 #data scailing
 data5 <- filter(data4, opre >0, liab>0) # remove negative value
 #str(data5) # check data structure
-data5$pl <- data5$liab/data5$opre #원보험료/발생손해액
+data5$pl <- data5$liab/data5$opre #발생손해액/원보험료
 colSums(is.na(data5)) #결측치 확인
 head(data5)
 
